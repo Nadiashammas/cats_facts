@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import '../model/cates.dart';
+import '../model/facts.dart';
 import 'package:http/http.dart' as http;
 
 class RemoteServices {

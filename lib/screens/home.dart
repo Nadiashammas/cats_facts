@@ -1,7 +1,9 @@
+import 'package:cats_facts/screens/facts.dart';
+import 'package:cats_facts/screens/images.dart';
 import 'package:flutter/material.dart';
 import 'package:translator/translator.dart';
-import '../model/cates.dart';
-import '../remote_services/remote_services.dart';
+import '../model/facts.dart';
+import '../remote_services/remote_services_facts.dart';
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
@@ -11,115 +13,35 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  String fact = '';
-  Cats? myCat;
-  bool loading = false;
-  GoogleTranslator translator = GoogleTranslator();
+  int _selectedScreenIndex = 0;
+  final List _screens = [
+    {"screen": const CatImages(), "title": "Images"},
+    {"screen": const Facts(), "title": "Facts"}
+  ];
 
-  loaddata() async {
-    myCat = await RemoteServices().getFact();
-    fact = myCat!.fact.toString();
-  }
-
-  void translate() {
-    translator.translate(fact, to: "ar").then((output) {
-      setState(() {
-        fact = output.text;
-        loaddata();
-      });
+  void _selectScreen(int index) {
+    setState(() {
+      _selectedScreenIndex = index;
     });
   }
 
   @override
-  void initState() {
-    loaddata();
-    super.initState();
-  }
-
-  @override
-  @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: Scaffold(
-        body: Stack(children: [
-          Container(
-            height: double.infinity,
-            width: double.infinity,
-            child: FittedBox(
-              fit: BoxFit.cover,
-              child: Image.network(
-                'https://i.pinimg.com/originals/18/84/d4/1884d4e8ec9560ebac194d2da56474c2.jpg',
-              ),
-            ),
-          ),
-          Positioned(
-            top: MediaQuery.of(context).size.height * 0.85,
-            child: Center(
-              child: ElevatedButton(
-                  style: ButtonStyle(
-                      backgroundColor: MaterialStateColor.resolveWith(
-                          (states) => Colors.transparent)),
-                  onPressed: () {
-                    setState(() {
-                      loaddata();
-                      loading = true;
-                    });
-                  },
-                  child: const Text(
-                    'Facts in English',
-                    style: TextStyle(fontSize: 20, letterSpacing: 1),
-                  )),
-            ),
-          ),
-          Positioned(
-            top: MediaQuery.of(context).size.height * 0.85,
-            left: MediaQuery.of(context).size.width * 0.55,
-            child: Center(
-              child: ElevatedButton(
-                  style: ButtonStyle(
-                      backgroundColor: MaterialStateColor.resolveWith(
-                          (states) => Colors.transparent)),
-                  onPressed: () {
-                    // showDataAlert();
-                    translate();
-                  },
-                  child: const Text(
-                    'Facts in Arabic',
-                    style: TextStyle(fontSize: 20, letterSpacing: 1),
-                  )),
-            ),
-          ),
-          Visibility(
-            visible: loading,
-            replacement: const Center(child: CircularProgressIndicator()),
-            child: Padding(
-                padding: const EdgeInsets.all(50.0),
-                child: myCat != null
-                    ? Container(
-                        color: Colors.white54,
-                        // width: 200,
-                        height: MediaQuery.of(context).size.height * 0.33,
-                        child: SingleChildScrollView(
-                          child: Padding(
-                            padding: const EdgeInsets.all(12.0),
-                            child: Text(
-                              //if myCat is not null
-                              (fact),
-                              textAlign: TextAlign.justify,
-                              style: const TextStyle(
-                                  fontSize: 25, fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                        ),
-                      )
-                    : const Card(
-                        //if myCat is null
-                        child: Text("Error while getting messages."),
-                      )),
-          ),
-        ]),
+        child: Scaffold(
+      appBar: AppBar(
+        title: Text(_screens[_selectedScreenIndex]["title"]),
       ),
-    );
+      body: _screens[_selectedScreenIndex]["screen"],
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedScreenIndex,
+        onTap: _selectScreen,
+        items: [
+          BottomNavigationBarItem(icon: Icon(Icons.image), label: 'Images'),
+          BottomNavigationBarItem(icon: Icon(Icons.info), label: 'Facts'),
+        ],
+      ),
+    ));
   }
 
   // showDataAlert() {
