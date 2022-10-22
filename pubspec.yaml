@@ -29,6 +29,8 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
+  image_downloader: ^0.31.0
+  full_screen_image_null_safe: ^2.0.0
   translator: ^0.1.7
   http: ^0.13.5
   flutter:
